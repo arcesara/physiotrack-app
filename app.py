@@ -283,7 +283,8 @@ def api_ejercicio_activo():
                             'nivel': activo.nivel, 'duracion_s': 0,
                             'reps': cfg['reps'], 'intervalo_ms': cfg['intervalo_ms']})
     return jsonify({'modo': 'analisis', 'ejercicio_id': 'estatico',
-                    'nivel': 1, 'duracion_s': 30, 'reps': 0, 'intervalo_ms': 0})
+                    'nivel': 1, 'duracion_s': 30, 'reps': 0, 'intervalo_ms': 0,
+                    'seleccionado': False})
 
 @app.route('/api/datos', methods=['POST'])
 def api_datos():
