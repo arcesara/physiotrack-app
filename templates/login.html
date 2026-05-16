@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Iniciar sesión — PhysioTrack{% endblock %}
+{% block content %}
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-logo">PT</div>
+    <h1>PhysioTrack</h1>
+    <p class="auth-subtitle">Plataforma de análisis biomecánico plantar</p>
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    <form method="POST">
+      <div class="form-group"><label>Email</label><input type="email" name="email" required placeholder="tu@email.com"></div>
+      <div class="form-group"><label>Contraseña</label><input type="password" name="password" required placeholder="••••••••"></div>
+      <button type="submit" class="btn-primary">Entrar</button>
+    </form>
+    <p class="auth-link">¿No tienes cuenta? <a href="{{ url_for('registro') }}">Regístrate</a></p>
+  </div>
+</div>
+{% endblock %}

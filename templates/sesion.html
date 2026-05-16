@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% block title %}{{ ejercicio_nombre }} — Nivel {{ nivel }} — PhysioTrack{% endblock %}
+{% block content %}
+<div class="sesion-container">
+
+  <div class="sesion-header">
+    <a href="{{ url_for('lista_ejercicios', modo=modo) }}" class="btn-back">← {{ 'Análisis' if modo == 'analisis' else 'Rehabilitación' }}</a>
+    <div class="sesion-titulo">
+      <h2>{{ ejercicio_nombre }}</h2>
+      <span class="nivel-badge">Nivel {{ nivel }}</span>
+      <span class="modo-badge {{ modo }}">{{ 'Análisis' if modo == 'analisis' else 'Rehabilitación' }}</span>
+    </div>
+    <p class="sesion-desc">{{ ejercicio_desc }}</p>
+    {% if modo == 'analisis' %}
+    <p class="sesion-config">Duración: {{ nivel_config.duracion_s }} segundos</p>
+    {% else %}
+    <p class="sesion-config">{{ nivel_config.reps }} repeticiones · una cada {{ (nivel_config.intervalo_ms / 1000)|int }}s</p>
+    {% endif %}
+  </div>
+
+  <div id="estado-banner" class="estado-banner estado-espera">
+    Toca el sensor para identificarte
+  </div>
+
+  <div class="sesion-grid">
+
+    <!-- Heatmap -->
+    <div class="heatmap-panel">
+      <h3>Distribución del peso</h3>
+      <div class="pies-container">
+        <div class="pie-wrapper">
+          <p class="pie-label">Pie izquierdo</p>
+          <canvas id="canvas-izq" width="130" height="260"></canvas>
+          <div class="pie-total">Total: <strong id="iz-total">0.0</strong> N</div>
+        </div>
+        <div class="pie-wrapper">
+          <p class="pie-label">Pie derecho</p>
+          <canvas id="canvas-der" width="130" height="260"></canvas>
+          <div class="pie-total">Total: <strong id="der-total">0.0</strong> N</div>
+        </div>
+      </div>
+      <div class="leyenda">
+        <div class="leyenda-gradient"></div>
+        <div class="leyenda-labels"><span>Sin presión</span><span>Máxima presión</span></div>
+      </div>
+    </div>
+
+    <!-- Métricas -->
+    <div class="metricas-panel">
+
+      <div class="metrica-card">
+        <div class="metrica-tag">HR</div>
+        <div class="metrica-valor"><span id="hr-valor">--</span> <small>bpm</small></div>
+        <div class="metrica-label">Frecuencia cardíaca</div>
+      </div>
+
+      <div class="metrica-card">
+        <div class="metrica-tag">EMG</div>
+        <div class="metrica-valor"><span id="emg-valor">--</span> <small>V</small></div>
+        <div class="metrica-label">Actividad muscular</div>
+        <div class="emg-bar-bg"><div id="emg-bar" class="emg-bar" style="width:0%"></div></div>
+      </div>
+
+      {% if modo == 'rehabilitacion' %}
+      <div class="metrica-card">
+        <div class="metrica-tag">REP</div>
+        <div class="metrica-valor"><span id="reps-valor">0</span> <small>/ {{ nivel_config.reps }}</small></div>
+        <div class="metrica-label">Repeticiones</div>
+        <div class="reps-bg"><div id="reps-bar" class="reps-bar" style="width:0%"></div></div>
+      </div>
+      {% else %}
+      <div class="metrica-card">
+        <div class="metrica-tag">TIEMPO</div>
+        <div class="metrica-valor"><span id="tiempo-valor">{{ nivel_config.duracion_s }}</span> <small>s</small></div>
+        <div class="metrica-label">Tiempo restante</div>
+        <div class="reps-bg"><div id="tiempo-bar" class="reps-bar" style="width:100%"></div></div>
+      </div>
+      {% endif %}
+
+      <div class="metrica-card">
+        <div class="metrica-tag">EQ</div>
+        <div class="equilibrio-bar-container">
+          <span id="eq-izq-pct">50%</span>
+          <div class="equilibrio-bar">
+            <div id="eq-izq" class="eq-izq" style="width:50%"></div>
+            <div id="eq-der" class="eq-der" style="width:50%"></div>
+          </div>
+          <span id="eq-der-pct">50%</span>
+        </div>
+        <div class="metrica-label">Equilibrio Izq / Der</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Resumen -->
+  <div id="resumen" class="resumen hidden">
+    <h3>Sesión completada</h3>
+    <div class="resumen-stats">
+      <div class="resumen-stat"><strong id="res-hr">0</strong><span>BPM medio</span></div>
+      <div class="resumen-stat"><strong id="res-emg">0</strong><span>EMG medio (V)</span></div>
+      <div class="resumen-stat"><strong id="res-eq">0</strong><span>% equilibrio</span></div>
+      {% if modo == 'rehabilitacion' %}
+      <div class="resumen-stat"><strong id="res-reps">0</strong><span>Repeticiones</span></div>
+      {% else %}
+      <div class="resumen-stat"><strong id="res-dur">0</strong><span>Segundos</span></div>
+      {% endif %}
+    </div>
+    <div id="resumen-acciones" class="resumen-acciones"></div>
+  </div>
+
+</div>
+
+<script>
+const MODO         = "{{ modo }}";
+const EJERCICIO_ID = "{{ ejercicio_id }}";
+const NIVEL        = {{ nivel }};
+const DURACION_S   = {{ nivel_config.duracion_s if modo == 'analisis' else 0 }};
+const REPS_TOTAL   = {{ nivel_config.reps if modo == 'rehabilitacion' else 0 }};
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/sesion.js') }}"></script>
+<style>
+.sesion-container { display: flex; flex-direction: column; gap: 20px; }
+.sesion-header { margin-bottom: 4px; }
+.sesion-titulo { display: flex; align-items: center; gap: 10px; margin: 8px 0; flex-wrap: wrap; }
+.sesion-titulo h2 { margin: 0; font-size: 20px; }
+.nivel-badge { background: #3b82f6; color: #fff; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+.modo-badge { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+.modo-badge.analisis { background: #fef3c7; color: #92400e; }
+.modo-badge.rehabilitacion { background: #d1fae5; color: #065f46; }
+.sesion-desc { font-size: 14px; color: #666; margin: 4px 0; }
+.sesion-config { font-size: 13px; color: #888; margin: 0; }
+.sesion-grid { display: grid; grid-template-columns: 1fr 280px; gap: 24px; }
+@media (max-width: 700px) { .sesion-grid { grid-template-columns: 1fr; } }
+.heatmap-panel { background: #fff; border-radius: 12px; padding: 24px; border: 1px solid #e5e7eb; }
+.heatmap-panel h3 { font-size: 15px; margin-bottom: 16px; }
+.pies-container { display: flex; justify-content: center; gap: 40px; }
+.pie-wrapper { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.pie-label { font-size: 13px; font-weight: 500; color: #555; }
+.pie-total { font-size: 13px; color: #555; }
+.leyenda { margin-top: 16px; }
+.leyenda-gradient { height: 8px; border-radius: 4px; background: linear-gradient(to right,#fff,#ffff00,#ff6600,#ff0000); border: 1px solid #e5e7eb; margin-bottom: 4px; }
+.leyenda-labels { display: flex; justify-content: space-between; font-size: 11px; color: #888; }
+.metricas-panel { display: flex; flex-direction: column; gap: 12px; }
+.metrica-card { background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #e5e7eb; }
+.metrica-tag { font-size: 10px; font-weight: 700; letter-spacing: .08em; color: #3b82f6; margin-bottom: 4px; }
+.metrica-valor { font-size: 26px; font-weight: 700; }
+.metrica-valor small { font-size: 13px; font-weight: 400; color: #888; }
+.metrica-label { font-size: 12px; color: #888; margin-top: 2px; }
+.emg-bar-bg, .reps-bg { background: #f3f4f6; border-radius: 4px; height: 5px; margin-top: 10px; overflow: hidden; }
+.emg-bar { height: 100%; background: #10b981; border-radius: 4px; transition: width .3s; }
+.reps-bar { height: 100%; background: #3b82f6; border-radius: 4px; transition: width .4s; }
+.equilibrio-bar-container { display: flex; align-items: center; gap: 8px; margin: 8px 0; font-size: 12px; font-weight: 500; }
+.equilibrio-bar { flex: 1; height: 8px; border-radius: 4px; overflow: hidden; display: flex; }
+.eq-izq { background: #3b82f6; transition: width .3s; }
+.eq-der { background: #10b981; transition: width .3s; }
+.resumen { background: #fff; border-radius: 12px; padding: 24px; border: 1px solid #e5e7eb; text-align: center; }
+.resumen h3 { font-size: 18px; margin-bottom: 16px; }
+.resumen-stats { display: flex; justify-content: center; gap: 24px; margin-bottom: 16px; flex-wrap: wrap; }
+.resumen-stat strong { display: block; font-size: 28px; color: #3b82f6; }
+.resumen-stat span { font-size: 12px; color: #888; }
+.resumen-acciones { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.hidden { display: none; }
+.estado-banner { padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 500; text-align: center; margin-bottom: 4px; }
+.estado-espera { background: #f3f4f6; color: #6b7280; }
+.estado-activo { background: #ecfdf5; color: #059669; }
+.estado-completado { background: #eff6ff; color: #3b82f6; }
+</style>
+{% endblock %}

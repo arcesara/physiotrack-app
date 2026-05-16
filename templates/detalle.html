@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Detalle sesión — PhysioTrack{% endblock %}
+{% block head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <a href="{{ url_for('historial') }}" class="btn-back">← Historial</a>
+  <h2>{{ sesion.nombre_ejercicio() }}</h2>
+  <p>{{ sesion.fecha_local().strftime('%d de %B de %Y a las %H:%M') }} — Nivel {{ sesion.nivel }}</p>
+</div>
+
+<div class="detalle-stats">
+  <div class="d-stat"><strong>{{ sesion.hr_medio }}</strong><span>BPM medio</span></div>
+  <div class="d-stat"><strong>{{ sesion.emg_medio }}</strong><span>V EMG</span></div>
+  <div class="d-stat"><strong>{{ sesion.equilibrio_pct }}%</strong><span>Equilibrio</span></div>
+  <div class="d-stat"><strong>{{ (sesion.duracion_s / 60)|round(1) }}</strong><span>Minutos</span></div>
+  {% if sesion.reps_total > 0 %}
+  <div class="d-stat"><strong>{{ sesion.reps_total }}</strong><span>Repeticiones</span></div>
+  {% endif %}
+</div>
+
+<div class="charts-section">
+  <h3>Frecuencia cardíaca</h3>
+  <canvas id="hr-chart" height="100"></canvas>
+  <h3>Actividad muscular (EMG)</h3>
+  <canvas id="emg-chart" height="100"></canvas>
+  <h3>Equilibrio bilateral</h3>
+  <canvas id="eq-chart" height="100"></canvas>
+</div>
+
+<script>
+const datos   = {{ sesion.datos_json | safe }};
+const muestras = datos.muestras || [];
+const step = Math.max(1, Math.floor(muestras.length / 100));
+const muestras_reducidas = muestras.filter((_, i) => i % step === 0);
+const labels = muestras_reducidas.map((_, i) => i);
+
+const opts = { responsive: true, plugins: { legend: { display: false } },
+               scales: { x: { display: false }, y: { beginAtZero: false } } };
+
+new Chart(document.getElementById('hr-chart'), {
+  type: 'line',
+  data: { labels, datasets: [{ data: muestras_reducidas.map(m => m.hr),
+    borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,.1)',
+    fill: true, tension: 0.3, pointRadius: 0 }] },
+  options: opts
+});
+
+new Chart(document.getElementById('emg-chart'), {
+  type: 'line',
+  data: { labels, datasets: [{ data: muestras_reducidas.map(m => m.emg),
+    borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,.1)',
+    fill: true, tension: 0.3, pointRadius: 0 }] },
+  options: opts
+});
+
+new Chart(document.getElementById('eq-chart'), {
+  type: 'line',
+  data: { labels, datasets: [
+    { label: 'Izq %', data: muestras_reducidas.map(m => m.pct_izq),
+      borderColor: '#3b82f6', tension: 0.3, pointRadius: 0, fill: false },
+    { label: 'Der %', data: muestras_reducidas.map(m => m.pct_der),
+      borderColor: '#10b981', tension: 0.3, pointRadius: 0, fill: false },
+  ]},
+  options: { responsive: true, plugins: { legend: { display: true } },
+             scales: { x: { display: false }, y: { min: 0, max: 100 } } }
+});
+</script>
+
+<style>
+.detalle-stats { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
+.d-stat { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px 20px; text-align: center; }
+.d-stat strong { display: block; font-size: 28px; color: #3b82f6; }
+.d-stat span { font-size: 12px; color: #888; }
+.charts-section h3 { font-size: 14px; font-weight: 500; margin: 20px 0 8px; color: #555; }
+canvas { background: #fff; border-radius: 10px; padding: 12px; border: 1px solid #e5e7eb; }
+</style>
+{% endblock %}

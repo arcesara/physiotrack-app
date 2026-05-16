@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Historial — PhysioTrack{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2>Historial de sesiones</h2>
+</div>
+
+{% if sesiones %}
+<div class="historial-lista">
+  {% for s in sesiones %}
+  <a href="{{ url_for('detalle', sesion_id=s.id) }}" class="historial-item">
+    <div class="historial-fecha">
+      <strong>{{ s.fecha_local().strftime('%d %b %Y') }}</strong>
+      <span>{{ s.fecha_local().strftime('%H:%M') }}</span>
+    </div>
+    <div class="historial-ejercicio">
+      <strong>{{ s.nombre_ejercicio() }}</strong>
+      <div class="historial-badges">
+        <span class="modo-pill {{ s.modo }}">{{ 'Análisis' if s.modo == 'analisis' else 'Rehab' }}</span>
+        <span class="nivel-pill">Nivel {{ s.nivel }}</span>
+      </div>
+    </div>
+    <div class="historial-stats">
+      <span>{{ s.hr_medio }} bpm</span>
+      <span>{{ s.emg_medio }} V</span>
+      <span>{{ s.equilibrio_pct }}% eq.</span>
+    </div>
+    <div class="historial-arrow">›</div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <p>No tienes sesiones registradas todavía</p>
+  <a href="{{ url_for('dashboard') }}" class="btn-primary">Empezar</a>
+</div>
+{% endif %}
+
+<style>
+.historial-lista { display: flex; flex-direction: column; gap: 10px; }
+.historial-item { background: #fff; border-radius: 10px; padding: 16px 20px; border: 1px solid #e5e7eb; display: flex; align-items: center; gap: 16px; transition: border-color .2s; }
+.historial-item:hover { border-color: #3b82f6; }
+.historial-fecha strong { display: block; font-size: 14px; }
+.historial-fecha span { font-size: 12px; color: #888; }
+.historial-ejercicio { flex: 1; }
+.historial-ejercicio strong { display: block; font-size: 14px; margin-bottom: 4px; }
+.historial-badges { display: flex; gap: 6px; }
+.modo-pill, .nivel-pill { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+.modo-pill.analisis { background: #fef3c7; color: #92400e; }
+.modo-pill.rehabilitacion { background: #d1fae5; color: #065f46; }
+.nivel-pill { background: #eff6ff; color: #1d4ed8; }
+.historial-stats { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: #666; text-align: right; }
+.historial-arrow { font-size: 20px; color: #ccc; }
+.empty-state { text-align: center; padding: 60px 20px; color: #888; }
+.empty-state p { margin-bottom: 16px; }
+</style>
+{% endblock %}

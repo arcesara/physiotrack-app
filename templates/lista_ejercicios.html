@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Análisis' if modo == 'analisis' else 'Rehabilitación' }} — PhysioTrack{% endblock %}
+{% block content %}
+<div class="page-header">
+  <a href="{{ url_for('dashboard') }}" class="btn-back">← Inicio</a>
+  <h2>{{ 'Modo Análisis' if modo == 'analisis' else 'Modo Rehabilitación' }}</h2>
+  <p>{{ 'Selecciona el tipo de análisis a realizar' if modo == 'analisis' else 'Selecciona un ejercicio para continuar' }}</p>
+</div>
+
+<div class="ejercicios-lista">
+  {% for ej in ejercicios %}
+  <div class="ejercicio-card">
+    <div class="ejercicio-info">
+      <h3>{{ ej.nombre }}</h3>
+      <p>{{ ej.descripcion }}</p>
+      {% if modo == 'analisis' %}
+      <span class="duracion-badge">{{ ej.duracion_s }}s</span>
+      {% endif %}
+      <div class="niveles-bar">
+        {% for n in range(1, 6) %}
+        <div class="nivel-dot {% if ej.nivel_actual > n %}done{% elif ej.nivel_actual == n %}current{% endif %}">{{ n }}</div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="ejercicio-accion">
+      <a href="{{ url_for('sesion_ejercicio', modo=modo, ejercicio_id=ej.id, nivel=ej.nivel_actual) }}" class="btn-primary">
+        Nivel {{ ej.nivel_actual }}
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<style>
+.ejercicios-lista { display: flex; flex-direction: column; gap: 12px; }
+.ejercicio-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 20px; }
+.ejercicio-card:hover { border-color: #3b82f6; }
+.ejercicio-info { flex: 1; }
+.ejercicio-info h3 { font-size: 15px; margin-bottom: 4px; }
+.ejercicio-info p { font-size: 13px; color: #666; margin-bottom: 10px; }
+.duracion-badge { display: inline-block; background: #eff6ff; color: #3b82f6; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 10px; margin-bottom: 10px; }
+.niveles-bar { display: flex; gap: 6px; }
+.nivel-dot { width: 28px; height: 28px; border-radius: 50%; background: #f3f4f6; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #9ca3af; }
+.nivel-dot.done { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+.nivel-dot.current { background: #fff; border: 2px solid #3b82f6; color: #3b82f6; }
+.ejercicio-accion { flex-shrink: 0; }
+</style>
+{% endblock %}

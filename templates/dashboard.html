@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Inicio — PhysioTrack{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2>Hola, {{ usuario.nombre }}</h2>
+  <p>Plataforma de análisis biomecánico plantar</p>
+</div>
+
+<div class="modo-grid">
+  <a href="{{ url_for('lista_ejercicios', modo='analisis') }}" class="modo-card modo-analisis">
+    <div class="modo-icon">AN</div>
+    <h3>Modo Análisis</h3>
+    <p>Evaluación estática de la distribución de presión plantar y equilibrio bilateral</p>
+    <span class="modo-btn">Ir al análisis</span>
+  </a>
+  <a href="{{ url_for('lista_ejercicios', modo='rehabilitacion') }}" class="modo-card modo-rehab">
+    <div class="modo-icon">RH</div>
+    <h3>Modo Rehabilitación</h3>
+    <p>Ejercicios guiados con seguimiento de presión, EMG y frecuencia cardíaca</p>
+    <span class="modo-btn">Ir a ejercicios</span>
+  </a>
+</div>
+
+<div class="dashboard-bottom">
+  {% if ultima %}
+  <div class="card">
+    <div class="card-tag">Última sesión</div>
+    <h3>{{ ultima.nombre_ejercicio() }}</h3>
+    <p>{{ ultima.fecha_local().strftime('%d/%m/%Y a las %H:%M') }} — Nivel {{ ultima.nivel }}</p>
+    <div class="stats-mini">
+      <span><strong>{{ ultima.hr_medio }}</strong> bpm</span>
+      <span><strong>{{ ultima.emg_medio }}</strong> V EMG</span>
+      <span><strong>{{ ultima.equilibrio_pct }}%</strong> equilibrio</span>
+    </div>
+    <a href="{{ url_for('detalle', sesion_id=ultima.id) }}" class="btn-secondary">Ver detalle</a>
+  </div>
+  {% endif %}
+
+  <div class="card">
+    <div class="card-tag">Progreso</div>
+    <h3>Mis estadísticas</h3>
+    <p>Consulta la evolución de tus métricas a lo largo del tiempo por ejercicio</p>
+    <a href="{{ url_for('estadisticas') }}" class="btn-secondary">Ver estadísticas</a>
+  </div>
+
+  <div class="card">
+    <div class="card-tag">Registro</div>
+    <h3>Historial completo</h3>
+    <p>Todas tus sesiones registradas con sus datos completos</p>
+    <a href="{{ url_for('historial') }}" class="btn-secondary">Ver historial</a>
+  </div>
+</div>
+{% endblock %}

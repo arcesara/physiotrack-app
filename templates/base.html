@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#3b82f6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="PhysioTrack">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/static/icons/icon-192.png">
+  <title>{% block title %}PhysioTrack{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  {% if session.usuario_id %}
+  <nav>
+    <div class="nav-brand">PhysioTrack</div>
+    <div class="nav-links">
+      <a href="{{ url_for('dashboard') }}" {% if request.endpoint == 'dashboard' %}class="active"{% endif %}>Inicio</a>
+      <a href="{{ url_for('lista_ejercicios', modo='analisis') }}" {% if request.endpoint == 'lista_ejercicios' and request.view_args.get('modo') == 'analisis' %}class="active"{% endif %}>Análisis</a>
+      <a href="{{ url_for('lista_ejercicios', modo='rehabilitacion') }}" {% if request.endpoint == 'lista_ejercicios' and request.view_args.get('modo') == 'rehabilitacion' %}class="active"{% endif %}>Rehabilitación</a>
+      <a href="{{ url_for('historial') }}" {% if request.endpoint == 'historial' %}class="active"{% endif %}>Historial</a>
+      <a href="{{ url_for('estadisticas') }}" {% if request.endpoint == 'estadisticas' %}class="active"{% endif %}>Estadísticas</a>
+      <a href="{{ url_for('logout') }}" class="btn-logout">Salir</a>
+    </div>
+  </nav>
+  {% endif %}
+  <main>{% block content %}{% endblock %}</main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
