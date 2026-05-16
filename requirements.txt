@@ -1,0 +1,8 @@
+flask
+flask-socketio
+flask-sqlalchemy
+gevent
+gevent-websocket
+python-socketio
+gunicorn
+werkzeug
