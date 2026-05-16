@@ -276,12 +276,13 @@ def api_ejercicio_activo():
             cfg = NIVELES_ANALISIS.get(activo.nivel, NIVELES_ANALISIS[1])
             return jsonify({'modo': activo.modo, 'ejercicio_id': activo.ejercicio_id,
                             'nivel': activo.nivel, 'duracion_s': cfg['duracion_s'],
-                            'reps': 0, 'intervalo_ms': 0})
+                            'reps': 0, 'intervalo_ms': 0, 'seleccionado': True})
         else:
             cfg = NIVELES_REHAB.get(activo.nivel, NIVELES_REHAB[1])
             return jsonify({'modo': activo.modo, 'ejercicio_id': activo.ejercicio_id,
                             'nivel': activo.nivel, 'duracion_s': 0,
-                            'reps': cfg['reps'], 'intervalo_ms': cfg['intervalo_ms']})
+                            'reps': cfg['reps'], 'intervalo_ms': cfg['intervalo_ms'],
+                            'seleccionado': True})
     return jsonify({'modo': 'analisis', 'ejercicio_id': 'estatico',
                     'nivel': 1, 'duracion_s': 30, 'reps': 0, 'intervalo_ms': 0,
                     'seleccionado': False})
