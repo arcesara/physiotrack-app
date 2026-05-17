@@ -294,6 +294,10 @@ def api_datos():
     if not datos: return jsonify({'error': 'Sin datos'}), 400
     if datos.get('tipo') == 'rep_completada':
         socketio.emit('rep_completada', {'rep': datos.get('rep'), 'total': datos.get('total')})
+    elif datos.get('tipo') == 'pausada':
+        socketio.emit('sesion_pausada', {})
+    elif datos.get('tipo') == 'reanudada':
+        socketio.emit('sesion_reanudada', {})
     else:
         socketio.emit('datos_sensores', datos)
     return jsonify({'ok': True})
