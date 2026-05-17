@@ -91,6 +91,7 @@ class Sesion(db.Model):
     emg_medio     = db.Column(db.Float, default=0)
     equilibrio_pct = db.Column(db.Float, default=0)
     datos_json    = db.Column(db.Text, default='{}')
+    emergencia    = db.Column(db.Boolean, default=False)
 
     def nombre_ejercicio(self):
         if self.modo == 'analisis':
