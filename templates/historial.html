@@ -18,6 +18,9 @@
       <div class="historial-badges">
         <span class="modo-pill {{ s.modo }}">{{ 'Análisis' if s.modo == 'analisis' else 'Rehab' }}</span>
         <span class="nivel-pill">Nivel {{ s.nivel }}</span>
+        {% if s.emergencia %}
+        <span class="emergencia-pill">Detenida</span>
+        {% endif %}
       </div>
     </div>
     <div class="historial-stats">
@@ -55,3 +58,7 @@
 .empty-state p { margin-bottom: 16px; }
 </style>
 {% endblock %}
+
+<style>
+.emergencia-pill { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: #fef2f2; color: #dc2626; }
+</style>
