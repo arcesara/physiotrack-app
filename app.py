@@ -322,6 +322,7 @@ def api_sesion():
         hr_medio       = datos.get('hr_medio',      0),
         emg_medio      = datos.get('emg_medio',     0),
         equilibrio_pct = datos.get('equilibrio_pct',0),
+        emergencia     = datos.get('emergencia',    False),
         datos_json     = json.dumps(datos),
     )
     db.session.add(nueva)
