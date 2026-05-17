@@ -30,8 +30,11 @@
   <main>{% block content %}{% endblock %}</main>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
   <script>
+    // Eliminar cualquier service worker registrado anteriormente
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(() => {});
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        for (let r of registrations) r.unregister();
+      });
     }
   </script>
   {% block scripts %}{% endblock %}
