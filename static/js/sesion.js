@@ -198,11 +198,6 @@ socket.on('sesion_completada', datos => {
   if (resumenAcc) resumenAcc.innerHTML = html;
 });
 
-socket.on('touch_detectado', () => {
-  estadoBanner.className = 'estado-banner estado-activo';
-  estadoBanner.textContent = 'Identificado — la sesión comenzará automáticamente';
-});
-
 // ─── INIT ───────────────────────────────────────────────────
 renderHeatmap('canvas-izq',{talon:0,adel_izq:0,adel_der:0},true);
 renderHeatmap('canvas-der',{talon:0,adel_izq:0,adel_der:0},false);
