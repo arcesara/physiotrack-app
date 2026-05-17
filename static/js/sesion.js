@@ -163,6 +163,16 @@ socket.on('datos_sensores', datos => {
   }
 });
 
+socket.on('sesion_pausada', () => {
+  estadoBanner.className = 'estado-banner estado-espera';
+  estadoBanner.textContent = 'Sesión pausada — pulsa START para reanudar';
+});
+
+socket.on('sesion_reanudada', () => {
+  estadoBanner.className = 'estado-banner estado-activo';
+  estadoBanner.textContent = 'Sesión en curso';
+});
+
 socket.on('rep_completada', datos => {
   if (!repsValorEl) return;
   repsValorEl.textContent = datos.rep;
