@@ -1,4 +1,4 @@
-const CACHE = 'physiotrack-v1';
+const CACHE = 'physiotrack-v2';
 const ASSETS = ['/', '/static/css/style.css', '/static/js/sesion.js'];
 
 self.addEventListener('install', e => {
